@@ -25,7 +25,9 @@
         body {
             background-color: var(--primary-bg);
             color: var(--text-dark);
-            padding-bottom: 70px; /* برای نوار پایین */
+            padding-bottom: 80px; /* برای نوار پایین */
+            position: relative;
+            min-height: 100vh;
         }
 
         /* هدر و نوار جستجو */
@@ -46,7 +48,7 @@
         }
 
         .logo-img {
-            height: 40px;
+            height: 45px;
             object-fit: contain;
         }
 
@@ -70,14 +72,14 @@
         /* گرید محصولات */
         .products-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr); /* ۲ ستون برای موبایل، در دسکتاپ ۴ ستون میشود */
+            grid-template-columns: repeat(2, 1fr); /* ۲ ستون برای موبایل */
             gap: 10px;
             padding: 15px;
         }
 
         @media (min-width: 768px) {
             .products-grid {
-                grid-template-columns: repeat(4, 1fr); /* ۴ عکس در هر ردیف */
+                grid-template-columns: repeat(4, 1fr); /* ۴ عکس در هر ردیف در دسکتاپ */
                 max-width: 1200px;
                 margin: 0 auto;
             }
@@ -91,12 +93,15 @@
             position: relative;
             display: flex;
             flex-direction: column;
+            transition: transform 0.2s;
         }
+        .product-card:hover { transform: translateY(-3px); }
 
         .product-card img {
             width: 100%;
             height: 150px;
             object-fit: cover;
+            background: #f9f9f9;
         }
 
         .product-info {
@@ -113,6 +118,7 @@
             margin-bottom: 5px;
             height: 36px;
             overflow: hidden;
+            line-height: 1.4;
         }
 
         .product-price {
@@ -139,6 +145,7 @@
 
         .btn-add { background: var(--accent); color: white; }
         .btn-add:hover { background: #1e4468; }
+        .btn-add:disabled { background: #ccc; cursor: not-allowed; }
         .btn-fav { background: #eee; color: #555; }
         .btn-fav.active { background: #ffe0e0; color: var(--red); }
 
@@ -155,7 +162,9 @@
             border-radius: 20px;
             cursor: pointer;
             font-weight: bold;
+            transition: 0.3s;
         }
+        .view-all-btn:hover { background: var(--accent); color: white; }
 
         /* نوار پایین (ناوبری) */
         .bottom-nav {
@@ -180,53 +189,12 @@
             flex-direction: column;
             align-items: center;
             gap: 3px;
+            transition: 0.2s;
         }
         .nav-item.active { color: var(--accent); font-weight: bold; }
         .nav-item span { font-size: 20px; }
 
         /* پنل مدیریت (مخفی) */
-        #adminPanel {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 200;
-            justify-content: center;
-            align-items: center;
-        }
-        .admin-box {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            width: 90%;
-            max-width: 400px;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-        .admin-box h3 { margin-bottom: 15px; text-align: center; }
-        .admin-form input, .admin-form select {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-        .admin-form button {
-            width: 100%;
-            padding: 10px;
-            background: var(--accent);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .admin-list { margin-top: 15px; border-top: 1px solid #eee; padding-top: 10px; }
-        .admin-item { display: flex; justify-content: space-between; align-items: center; font-size: 13px; margin-bottom: 8px; }
-        .admin-item button { padding: 3px 8px; font-size: 11px; border-radius: 4px; border: none; cursor: pointer; margin-right: 5px;}
-        .btn-edit { background: #f1c40f; color: #fff; }
-        .btn-delete { background: var(--red); color: #fff; }
-
-        /* مودال‌ها (سبد خرید، علاقه‌مندی، پرداخت) */
         .modal {
             display: none;
             position: fixed;
@@ -244,6 +212,7 @@
             max-height: 85vh;
             display: flex;
             flex-direction: column;
+            overflow: hidden;
         }
         .modal-header {
             padding: 15px;
@@ -252,8 +221,9 @@
             justify-content: space-between;
             align-items: center;
             font-weight: bold;
+            background: #fafafa;
         }
-        .modal-header span { cursor: pointer; font-size: 20px; color: #888; }
+        .modal-header span { cursor: pointer; font-size: 22px; color: #888; line-height: 1; }
         .modal-body {
             padding: 15px;
             overflow-y: auto;
@@ -263,6 +233,7 @@
             padding: 15px;
             border-top: 1px solid #eee;
             text-align: center;
+            background: #fafafa;
         }
         .modal-footer button {
             width: 100%;
@@ -274,38 +245,48 @@
             font-size: 16px;
             font-weight: bold;
             cursor: pointer;
+            transition: 0.2s;
         }
-        
+        .modal-footer button:hover { opacity: 0.9; }
+
+        /* سبد خرید و علاقه‌مندی */
         .cart-item, .fav-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 8px 0;
+            padding: 10px 0;
             border-bottom: 1px solid #f0f0f0;
             font-size: 13px;
         }
-
-        .payment-options {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin: 15px 0;
+        .cart-item:last-child, .fav-item:last-child { border-bottom: none; }
+        
+        /* فرم پرداخت */
+        .form-group { margin-bottom: 10px; }
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            outline: none;
         }
-        .payment-options label {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 14px;
-        }
+        .form-group input:focus { border-color: var(--accent); }
+        
+        .payment-options { margin: 15px 0; display: flex; flex-direction: column; gap: 8px; }
+        .payment-options label { display: flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer; }
+        
         .date-option {
             background: #f9f9f9;
-            padding: 10px;
+            padding: 12px;
             border-radius: 8px;
             border: 1px solid #ddd;
             cursor: pointer;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
+            transition: 0.2s;
+            text-align: center;
+            font-size: 13px;
         }
-        .date-option.selected { border-color: var(--accent); background: #eef4fa; }
+        .date-option:hover { background: #f0f0f0; }
+        .date-option.selected { border-color: var(--accent); background: #eef4fa; font-weight: bold; }
 
         /* فوتر (تماس با ما) */
         .footer-contact {
@@ -316,10 +297,44 @@
             font-size: 13px;
             margin-top: 20px;
         }
-        .footer-contact a { color: #25D366; text-decoration: none; font-weight: bold;}
+        .footer-contact a { color: #25D366; text-decoration: none; font-weight: bold; }
         .address-box { font-size: 11px; margin-top: 5px; color: #aaa; }
 
-        /* آیتم‌های علاقه‌مندی */
+        /* پنل مدیریت */
+        .admin-form input, .admin-form select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            outline: none;
+        }
+        .admin-form button {
+            width: 100%;
+            padding: 12px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .admin-list { margin-top: 15px; border-top: 1px solid #eee; padding-top: 10px; }
+        .admin-item { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            font-size: 13px; 
+            margin-bottom: 8px;
+            background: #fafafa;
+            padding: 8px;
+            border-radius: 6px;
+        }
+        .admin-item button { padding: 4px 10px; font-size: 11px; border-radius: 4px; border: none; cursor: pointer; margin-right: 5px; }
+        .btn-edit { background: #f1c40f; color: #fff; }
+        .btn-delete { background: var(--red); color: #fff; }
+
+        /* بج علاقه‌مندی */
         .fav-btn-header { position: relative; }
         .badge {
             position: absolute;
@@ -329,7 +344,9 @@
             border-radius: 50%;
             padding: 2px 6px;
             font-size: 10px;
+            font-weight: bold;
         }
+        .empty-msg { text-align: center; color: #888; padding: 20px; font-size: 14px; }
     </style>
 </head>
 <body>
@@ -337,8 +354,13 @@
     <!-- هدر -->
     <header>
         <div class="header-top">
-            <img src="https://raw.githubusercontent.com/your-username/your-repo/main/logo.png" alt="لوگو" class="logo-img" id="logoImage" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 200 60\'><text x=\'10\' y=\'40\' font-family=\'Tahoma\' font-size=\'30\' fill=\'%232A5C8A\' font-weight=\'bold\'>ARSHIA</text></svg>'">
-            <div style="display: flex; gap: 15px;">
+            <!-- ⚠️ لینک لوگوی خود را اینجا جایگزین کنید (فایل logo.png در گیت‌هاب) -->
+            <img src="https://raw.githubusercontent.com/your-username/your-repo/main/logo.png" 
+                 alt="لوگو" 
+                 class="logo-img" 
+                 id="logoImage" 
+                 onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 200 60\'><text x=\'10\' y=\'40\' font-family=\'Tahoma\' font-size=\'30\' fill=\'%232A5C8A\' font-weight=\'bold\'>ARSHIA</text></svg>'">
+            <div style="display: flex; gap: 15px; align-items: center;">
                 <div class="nav-item fav-btn-header" onclick="openFavModal()">
                     <span>❤️</span>
                     <span class="badge" id="favBadge">0</span>
@@ -397,7 +419,7 @@
                 <!-- لیست سبد خرید -->
             </div>
             <div class="modal-footer">
-                <button onclick="openCheckout()">ثبت سفارش و پرداخت</button>
+                <button onclick="openCheckout()" style="background: var(--accent);">ثبت سفارش و پرداخت</button>
             </div>
         </div>
     </div>
@@ -437,9 +459,15 @@
             </div>
             <div class="modal-body" id="checkoutBody">
                 <p style="margin-bottom: 15px; font-weight: bold;">اطلاعات تماس</p>
-                <input type="text" id="customerName" placeholder="نام و نام خانوادگی" style="width:100%; padding:10px; margin-bottom:10px; border:1px solid #ddd; border-radius:5px;">
-                <input type="tel" id="customerPhone" placeholder="شماره تلفن (مثلاً 09123456789)" style="width:100%; padding:10px; margin-bottom:10px; border:1px solid #ddd; border-radius:5px;">
-                <input type="text" id="customerAddress" placeholder="آدرس دقیق پستی" style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px;">
+                <div class="form-group">
+                    <input type="text" id="customerName" placeholder="نام و نام خانوادگی">
+                </div>
+                <div class="form-group">
+                    <input type="tel" id="customerPhone" placeholder="شماره تلفن (مثلاً 09123456789)">
+                </div>
+                <div class="form-group">
+                    <input type="text" id="customerAddress" placeholder="آدرس دقیق پستی">
+                </div>
                 
                 <p style="margin-bottom: 10px; font-weight: bold;">زمان تحویل</p>
                 <div id="deliveryDates">
@@ -458,7 +486,7 @@
         </div>
     </div>
 
-    <!-- پنل مدیریت -->
+    <!-- پنل مدیریت (ورود) -->
     <div class="modal" id="adminLoginModal">
         <div class="modal-content" style="max-width: 350px;">
             <div class="modal-header">
@@ -466,13 +494,14 @@
                 <span onclick="closeModal('adminLoginModal')">&times;</span>
             </div>
             <div class="modal-body" style="text-align: center;">
-                <p>رمز عبور را وارد کنید:</p>
-                <input type="password" id="adminPass" placeholder="رمز عبور" style="width:100%; padding:10px; margin:10px 0; border:1px solid #ddd; border-radius:5px; text-align:center;">
-                <button onclick="checkAdminPass()" style="padding:10px 20px; background:var(--accent); color:white; border:none; border-radius:5px; cursor:pointer;">ورود</button>
+                <p style="margin-bottom: 10px;">رمز عبور را وارد کنید:</p>
+                <input type="password" id="adminPass" placeholder="رمز عبور" style="width:100%; padding:12px; margin:10px 0; border:1px solid #ddd; border-radius:6px; text-align:center; font-size:16px; letter-spacing: 5px;">
+                <button onclick="checkAdminPass()" style="padding:12px 20px; background:var(--accent); color:white; border:none; border-radius:6px; cursor:pointer; width:100%; font-weight:bold;">ورود</button>
             </div>
         </div>
     </div>
 
+    <!-- پنل مدیریت (اصلی) -->
     <div class="modal" id="adminPanelModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -484,7 +513,7 @@
                     <input type="text" id="adminTitle" placeholder="نام محصول (مثلاً جارو برقی)">
                     <input type="number" id="adminPrice" placeholder="قیمت (تومان)">
                     <input type="file" id="adminImage" accept="image/*" onchange="previewAdminImage(event)">
-                    <img id="adminPreview" style="max-width: 100%; height: 100px; object-fit: cover; display: none; margin-bottom: 10px; border-radius:5px;">
+                    <img id="adminPreview" style="max-width: 100%; height: 120px; object-fit: cover; display: none; margin-bottom: 10px; border-radius:6px;">
                     <select id="adminStatus">
                         <option value="available">موجود</option>
                         <option value="unavailable">ناموجود</option>
@@ -532,8 +561,17 @@
             // فقط ۱۲ محصول اول در صفحه اصلی
             const homeProducts = products.slice(0, 12);
             
-            grid.innerHTML = homeProducts.map(p => createProductCard(p)).join('');
-            allGrid.innerHTML = products.map(p => createProductCard(p)).join('');
+            if (homeProducts.length === 0) {
+                grid.innerHTML = '<div class="empty-msg">هیچ محصولی یافت نشد.</div>';
+            } else {
+                grid.innerHTML = homeProducts.map(p => createProductCard(p)).join('');
+            }
+            
+            if (products.length === 0) {
+                allGrid.innerHTML = '<div class="empty-msg">هیچ محصولی یافت نشد.</div>';
+            } else {
+                allGrid.innerHTML = products.map(p => createProductCard(p)).join('');
+            }
             
             updateBadges();
             renderAdminList();
@@ -547,16 +585,33 @@
                     <img src="${p.img}" alt="${p.title}" style="${isUnavailable ? 'opacity:0.5; filter:grayscale(1);' : ''}">
                     <div class="product-info">
                         <div>
-                            <div class="product-title">${p.title} ${isUnavailable ? '(ناموجود)' : ''}</div>
+                            <div class="product-title">${p.title} ${isUnavailable ? '<span style="color:red;font-size:10px;">(ناموجود)</span>' : ''}</div>
                             <div class="product-price">${p.price.toLocaleString()} تومان</div>
                         </div>
                         <div class="product-actions">
-                            <button class="btn-add" onclick="addToCart(${p.id})" ${isUnavailable ? 'disabled style="background:#ccc;"' : ''}>افزودن</button>
+                            <button class="btn-add" onclick="addToCart(${p.id})" ${isUnavailable ? 'disabled' : ''}>افزودن</button>
                             <button class="btn-fav ${isFav ? 'active' : ''}" onclick="toggleFav(${p.id})">❤️</button>
                         </div>
                     </div>
                 </div>
             `;
+        }
+
+        function filterProducts() {
+            const query = document.getElementById('searchInput').value.trim().toLowerCase();
+            const cards = document.querySelectorAll('#productGrid .product-card');
+            // جستجو در صفحه اصلی
+            const homeProducts = products.slice(0, 12);
+            const filtered = homeProducts.filter(p => p.title.toLowerCase().includes(query));
+            document.getElementById('productGrid').innerHTML = filtered.map(p => createProductCard(p)).join('');
+            
+            // جستجو در مودال مشاهده همه
+            const allFiltered = products.filter(p => p.title.toLowerCase().includes(query));
+            document.getElementById('allProductGrid').innerHTML = allFiltered.map(p => createProductCard(p)).join('');
+            
+            if (filtered.length === 0) {
+                document.getElementById('productGrid').innerHTML = '<div class="empty-msg">محصولی یافت نشد.</div>';
+            }
         }
 
         // --- سبد خرید و علاقه‌مندی ---
@@ -575,6 +630,8 @@
             else favorites.splice(index, 1);
             localStorage.setItem('favs', JSON.stringify(favorites));
             renderProducts();
+            // اگر مودال علاقه‌مندی باز است، رفرش کن
+            if(document.getElementById('favModal').style.display === 'flex') openFavModal();
             updateBadges();
         }
 
@@ -593,13 +650,13 @@
         function openCartModal() {
             const list = document.getElementById('cartItemsList');
             if (cart.length === 0) {
-                list.innerHTML = '<p style="text-align:center; color:#888;">سبد خرید خالی است.</p>';
+                list.innerHTML = '<p class="empty-msg">سبد خرید خالی است.</p>';
             } else {
                 list.innerHTML = cart.map((item, index) => `
                     <div class="cart-item">
-                        <span>${item.title}</span>
-                        <span>${item.price.toLocaleString()} تومان</span>
-                        <button onclick="removeFromCart(${index})" style="background:var(--red); color:white; border:none; border-radius:4px; padding:2px 6px; cursor:pointer;">حذف</button>
+                        <span style="font-weight:bold; max-width:120px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${item.title}</span>
+                        <span style="color:var(--accent);">${item.price.toLocaleString()} تومان</span>
+                        <button onclick="removeFromCart(${index})" style="background:var(--red); color:white; border:none; border-radius:4px; padding:4px 8px; cursor:pointer;">حذف</button>
                     </div>
                 `).join('');
             }
@@ -616,13 +673,13 @@
             const list = document.getElementById('favItemsList');
             const favProducts = products.filter(p => favorites.includes(p.id));
             if (favProducts.length === 0) {
-                list.innerHTML = '<p style="text-align:center; color:#888;">لیست علاقه‌مندی خالی است.</p>';
+                list.innerHTML = '<p class="empty-msg">لیست علاقه‌مندی خالی است.</p>';
             } else {
                 list.innerHTML = favProducts.map(p => `
                     <div class="fav-item">
-                        <span>${p.title}</span>
-                        <span>${p.price.toLocaleString()} تومان</span>
-                        <button onclick="addToCart(${p.id})" style="background:var(--accent); color:white; border:none; border-radius:4px; padding:2px 6px; cursor:pointer;">افزودن</button>
+                        <span style="font-weight:bold; max-width:120px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${p.title}</span>
+                        <span style="color:var(--accent);">${p.price.toLocaleString()} تومان</span>
+                        <button onclick="addToCart(${p.id})" style="background:var(--accent); color:white; border:none; border-radius:4px; padding:4px 8px; cursor:pointer;">افزودن</button>
                     </div>
                 `).join('');
             }
@@ -637,6 +694,7 @@
         function openAdminLogin() {
             if (isAdmin) {
                 openModal('adminPanelModal');
+                renderAdminList();
             } else {
                 document.getElementById('adminPass').value = '';
                 openModal('adminLoginModal');
@@ -670,12 +728,12 @@
         }
 
         function addProductAdmin() {
-            const title = document.getElementById('adminTitle').value;
+            const title = document.getElementById('adminTitle').value.trim();
             const price = parseInt(document.getElementById('adminPrice').value);
             const status = document.getElementById('adminStatus').value;
 
-            if (!title || !price) {
-                alert('لطفاً نام و قیمت را وارد کنید.');
+            if (!title || !price || isNaN(price)) {
+                alert('لطفاً نام و قیمت معتبر وارد کنید.');
                 return;
             }
 
@@ -689,7 +747,7 @@
             };
 
             products.push(newProduct);
-            alert('محصول اضافه شد.');
+            alert('محصول با موفقیت اضافه شد.');
             
             // ریست فرم
             document.getElementById('adminTitle').value = '';
@@ -703,9 +761,13 @@
 
         function renderAdminList() {
             const list = document.getElementById('adminProductList');
+            if(products.length === 0) {
+                list.innerHTML = '<p class="empty-msg">هیچ محصولی ثبت نشده است.</p>';
+                return;
+            }
             list.innerHTML = products.map(p => `
                 <div class="admin-item">
-                    <span>${p.title}</span>
+                    <span style="font-weight:bold;">${p.title}</span>
                     <div>
                         <button class="btn-edit" onclick="editProduct(${p.id})">ویرایش</button>
                         <button class="btn-delete" onclick="deleteProduct(${p.id})">حذف</button>
@@ -728,71 +790,12 @@
             const newPrice = prompt(`قیمت جدید برای ${product.title} (تومان):`, product.price);
             if (newPrice !== null && !isNaN(newPrice) && newPrice.trim() !== '') {
                 product.price = parseInt(newPrice);
-                renderProducts();
-                alert('قیمت با موفقیت تغییر کرد.');
             }
             
             const newStatus = prompt(`وضعیت موجودی (available / unavailable):`, product.status);
             if (newStatus === 'available' || newStatus === 'unavailable') {
                 product.status = newStatus;
-                renderProducts();
             }
-        }
-
-        // --- ثبت سفارش و پرداخت ---
-        function openCheckout() {
-            if (cart.length === 0) {
-                alert('سبد خرید شما خالی است.');
-                return;
-            }
-            closeModal('cartModal');
             
-            // تولید تاریخ‌های فردا، پس‌فردا و سه روز بعد
-            const datesDiv = document.getElementById('deliveryDates');
-            const today = new Date();
-            let datesHTML = '';
-            
-            for (let i = 1; i <= 3; i++) {
-                const nextDate = new Date(today);
-                nextDate.setDate(today.getDate() + i);
-                const dateStr = nextDate.toLocaleDateString('fa-IR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-                datesHTML += `<div class="date-option" onclick="selectDate(this)">${dateStr}</div>`;
-            }
-            datesDiv.innerHTML = datesHTML;
-            
-            openModal('checkoutModal');
-        }
-
-        function selectDate(element) {
-            document.querySelectorAll('.date-option').forEach(el => el.classList.remove('selected'));
-            element.classList.add('selected');
-        }
-
-        function submitOrder() {
-            const name = document.getElementById('customerName').value;
-            const phone = document.getElementById('customerPhone').value;
-            const address = document.getElementById('customerAddress').value;
-            const selectedDate = document.querySelector('.date-option.selected');
-            const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
-
-            if (!name || !phone || !address) {
-                alert('لطفاً نام، شماره تلفن و آدرس را وارد کنید.');
-                return;
-            }
-            if (!selectedDate) {
-                alert('لطفاً زمان تحویل را انتخاب کنید.');
-                return;
-            }
-
-            const total = cart.reduce((sum, item) => sum + item.price, 0);
-            
-            alert(`سفارش شما با موفقیت ثبت شد!\n\nنام: ${name}\nتلفن: ${phone}\nآدرس: ${address}\nزمان تحویل: ${selectedDate.innerText}\nروش پرداخت: ${paymentMethod === 'online' ? 'آنلاین' : 'در محل'}\nمبلغ کل: ${total.toLocaleString()} تومان\n\n(شبیه‌سازی درگاه پرداخت)`);
-            
-            // خالی کردن سبد خرید
-            cart = [];
-            saveCart();
-            closeModal('checkoutModal');
             renderProducts();
-        }
-
-        // --- جستجو ---
+            alert('تغییرات با موفقیت اعمال
