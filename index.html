@@ -29,6 +29,7 @@
     button { cursor: pointer; border: none; font-family: inherit; }
     img { max-width: 100%; display: block; }
 
+    /* Header */
     .header {
       background: var(--card);
       box-shadow: var(--shadow);
@@ -120,6 +121,7 @@
       justify-content: center;
     }
 
+    /* Main */
     .container {
       max-width: 1200px;
       margin: 0 auto;
@@ -250,6 +252,7 @@
     }
     .view-all-btn:hover { background: var(--primary-dark); }
 
+    /* Modal / Overlay */
     .overlay {
       position: fixed;
       inset: 0;
@@ -296,6 +299,7 @@
     }
     .modal-body { padding: 20px; }
 
+    /* Admin */
     .admin-form {
       display: grid;
       gap: 14px;
@@ -352,6 +356,7 @@
     .btn-warning { background: #f59e0b; color: white; }
     .btn-success { background: var(--success); color: white; }
 
+    /* Cart & Favorites */
     .cart-item, .fav-item {
       display: flex;
       gap: 12px;
@@ -393,6 +398,7 @@
       color: var(--muted);
     }
 
+    /* Order & Payment */
     .delivery-options {
       display: grid;
       gap: 10px;
@@ -414,6 +420,7 @@
     }
     .delivery-option input { accent-color: var(--primary); }
 
+    /* Contact */
     .contact-info {
       background: var(--card);
       border-radius: 16px;
@@ -431,6 +438,7 @@
     }
     .map-wrap iframe { width: 100%; height: 100%; border: 0; }
 
+    /* Footer */
     footer {
       text-align: center;
       padding: 24px;
@@ -439,6 +447,7 @@
       margin-top: 40px;
     }
 
+    /* Login */
     .login-box {
       max-width: 360px;
       margin: 40px auto;
@@ -594,6 +603,7 @@
         <button class="close-btn" onclick="closeAdmin()">×</button>
       </div>
       <div class="modal-body" id="adminContent">
+        <!-- Login or Panel will be injected -->
       </div>
     </div>
   </div>
@@ -602,4 +612,446 @@
 
   <footer>
     فروشگاه خانه © ۱۴۰۴ — همه حقوق محفوظ است
-          </footer>
+  </footer>
+
+  <script>
+    // ========== Data & State ==========
+    const ADMIN_PASS = "1357";
+    let products = JSON.parse(localStorage.getItem("shop_products") || "[]");
+    let cart = JSON.parse(localStorage.getItem("shop_cart") || "[]");
+    let favorites = JSON.parse(localStorage.getItem("shop_favorites") || "[]");
+    let isAdmin = false;
+
+    // Sample products if empty
+    if (products.length === 0) {
+      products = [
+        { id: 1, name: "جاروبرقی پارس خزر مدل VC-2000", price: 4500000, image: "https://via.placeholder.com/300x300?text=جاروبرقی", status: "موجود" },
+        { id: 2, name: "قاشق و چنگال استیل ۱۲ نفره", price: 890000, image: "https://via.placeholder.com/300x300?text=قاشق", status: "موجود" },
+        { id: 3, name: "مخلوط کن فیلیپس HR-2100", price: 3200000, image: "https://via.placeholder.com/300x300?text=مخلوط+کن", status: "موجود" },
+        { id: 4, name: "توستر نان نانوا مدل T-500", price: 1750000, image: "https://via.placeholder.com/300x300?text=توستر", status: "موجود" },
+        { id: 5, name: "چایی‌ساز فلر مدل TS-070", price: 2100000, image: "https://via.placeholder.com/300x300?text=چایی‌ساز", status: "موجود" },
+        { id: 6, name: "مایکروویو سامسونگ ۲۳ لیتری", price: 8900000, image: "https://via.placeholder.com/300x300?text=مایکروویو", status: "موجود نیست" },
+        { id: 7, name: "چاقو آشپزخانه ست ۶ تایی", price: 650000, image: "https://via.placeholder.com/300x300?text=چاقو", status: "موجود" },
+        { id: 8, name: "کتری برقی بوش ۱.۷ لیتر", price: 2800000, image: "https://via.placeholder.com/300x300?text=کتری", status: "موجود" },
+        { id: 9, name: "اسپرسوساز دلونگی EC-685", price: 12500000, image: "https://via.placeholder.com/300x300?text=اسپرسو", status: "موجود" },
+        { id: 10, name: "رنده برقی فیلیپس", price: 1950000, image: "https://via.placeholder.com/300x300?text=رنده", status: "موجود" },
+        { id: 11, name: "آبمیوه‌گیری پارس خزر", price: 3100000, image: "https://via.placeholder.com/300x300?text=آبمیوه", status: "موجود" },
+        { id: 12, name: "ظروف پیرکس ست ۵ تایی", price: 1200000, image: "https://via.placeholder.com/300x300?text=پیرکس", status: "موجود" },
+        { id: 13, name: "جارو شارژی بلک اند دکر", price: 4200000, image: "https://via.placeholder.com/300x300?text=جارو+شارژی", status: "موجود" },
+        { id: 14, name: "سینی سرو چوبی دست‌ساز", price: 480000, image: "https://via.placeholder.com/300x300?text=سینی", status: "موجود" }
+      ];
+      saveProducts();
+    }
+
+    // ========== Helpers ==========
+    function saveProducts() { localStorage.setItem("shop_products", JSON.stringify(products)); }
+    function saveCart() { localStorage.setItem("shop_cart", JSON.stringify(cart)); updateBadges(); }
+    function saveFavorites() { localStorage.setItem("shop_favorites", JSON.stringify(favorites)); updateBadges(); }
+
+    function toast(msg) {
+      const t = document.getElementById("toast");
+      t.textContent = msg;
+      t.classList.add("show");
+      setTimeout(() => t.classList.remove("show"), 2500);
+    }
+
+    function formatPrice(n) {
+      return n.toLocaleString("fa-IR") + " تومان";
+    }
+
+    function updateBadges() {
+      const cartBadge = document.getElementById("cartBadge");
+      const favBadge = document.getElementById("favBadge");
+      const cartCount = cart.reduce((s, i) => s + i.qty, 0);
+      cartBadge.style.display = cartCount ? "flex" : "none";
+      cartBadge.textContent = cartCount;
+      favBadge.style.display = favorites.length ? "flex" : "none";
+      favBadge.textContent = favorites.length;
+    }
+
+    // ========== Navigation ==========
+    function showPage(page) {
+      document.querySelectorAll("main").forEach(m => m.classList.add("hidden"));
+      document.getElementById("page-" + page).classList.remove("hidden");
+      if (page === "cart") renderCart();
+      if (page === "favorites") renderFavorites();
+      if (page === "home") renderHome();
+      window.scrollTo(0, 0);
+    }
+
+    // ========== Render Products ==========
+    function createProductCard(p, showActions = true) {
+      const isFav = favorites.includes(p.id);
+      const isOut = p.status !== "موجود";
+      return `
+        <div class="product-card" data-id="${p.id}">
+          <div class="product-img-wrap">
+            <img src="\( {p.image}" alt=" \){p.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/300x300?text=بدون+عکس'" />
+            <span class="product-status \( {isOut ? 'out' : ''}"> \){p.status}</span>
+          </div>
+          <div class="product-body">
+            <div class="product-name" title="\( {p.name}"> \){p.name}</div>
+            <div class="product-price">${formatPrice(p.price)}</div>
+            ${showActions ? `
+            <div class="product-actions">
+              <button class="btn btn-primary" onclick="addToCart(${p.id})" ${isOut ? 'disabled style="opacity:0.5"' : ''}>
+                ${isOut ? 'ناموجود' : 'افزودن به سبد'}
+              </button>
+              <button class="btn-fav \( {isFav ? 'active' : ''}" onclick="toggleFav( \){p.id})">${isFav ? '❤️' : '🤍'}</button>
+            </div>` : ''}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderHome() {
+      const grid = document.getElementById("productsGrid");
+      const list = products.filter(p => p.status !== "حذف شده").slice(0, 12);
+      grid.innerHTML = list.map(p => createProductCard(p)).join("") || '<div class="empty-msg">هنوز محصولی ثبت نشده</div>';
+    }
+
+    function openAllProducts() {
+      document.getElementById("allProductsOverlay").classList.add("show");
+      filterAllProducts();
+    }
+    function closeAllProducts() {
+      document.getElementById("allProductsOverlay").classList.remove("show");
+    }
+    function filterAllProducts() {
+      const q = (document.getElementById("searchAllInput")?.value || "").trim().toLowerCase();
+      const grid = document.getElementById("allProductsGrid");
+      let list = products.filter(p => p.status !== "حذف شده");
+      if (q) list = list.filter(p => p.name.toLowerCase().includes(q));
+      grid.innerHTML = list.map(p => createProductCard(p)).join("") || '<div class="empty-msg">موردی یافت نشد</div>';
+    }
+
+    function filterProducts() {
+      const q = document.getElementById("searchInput").value.trim().toLowerCase();
+      const cards = document.querySelectorAll("#productsGrid .product-card");
+      cards.forEach(card => {
+        const name = card.querySelector(".product-name").textContent.toLowerCase();
+        card.style.display = name.includes(q) ? "" : "none";
+      });
+    }
+
+    // ========== Cart ==========
+    function addToCart(id) {
+      const p = products.find(x => x.id === id);
+      if (!p || p.status !== "موجود") return toast("این کالا موجود نیست");
+      const item = cart.find(x => x.id === id);
+      if (item) item.qty++;
+      else cart.push({ id, qty: 1 });
+      saveCart();
+      toast("به سبد خرید اضافه شد 🛒");
+    }
+
+    function changeQty(id, delta) {
+      const item = cart.find(x => x.id === id);
+      if (!item) return;
+      item.qty += delta;
+      if (item.qty <= 0) cart = cart.filter(x => x.id !== id);
+      saveCart();
+      renderCart();
+    }
+
+    function renderCart() {
+      const list = document.getElementById("cartList");
+      const totalEl = document.getElementById("cartTotal");
+      if (cart.length === 0) {
+        list.innerHTML = '<div class="empty-msg">سبد خرید خالی است 🛒</div>';
+        totalEl.textContent = "";
+        return;
+      }
+      let total = 0;
+      list.innerHTML = cart.map(item => {
+        const p = products.find(x => x.id === item.id);
+        if (!p) return "";
+        total += p.price * item.qty;
+        return `
+          <div class="cart-item">
+            <img src="${p.image}" alt="" />
+            <div class="cart-item-info">
+              <div style="font-weight:600; font-size:14px;">${p.name}</div>
+              <div style="color:var(--primary); margin:4px 0;">${formatPrice(p.price)}</div>
+              <div class="qty-control">
+                <button class="qty-btn" onclick="changeQty(${item.id}, -1)">−</button>
+                <span>${item.qty}</span>
+                <button class="qty-btn" onclick="changeQty(${item.id}, 1)">+</button>
+              </div>
+            </div>
+            <button class="btn btn-danger btn-sm" onclick="changeQty(${item.id}, -999)">حذف</button>
+          </div>
+        `;
+      }).join("");
+      totalEl.textContent = "جمع کل: " + formatPrice(total);
+    }
+
+    // ========== Favorites ==========
+    function toggleFav(id) {
+      if (favorites.includes(id)) favorites = favorites.filter(x => x !== id);
+      else favorites.push(id);
+      saveFavorites();
+      renderHome();
+      if (!document.getElementById("page-favorites").classList.contains("hidden")) renderFavorites();
+      toast(favorites.includes(id) ? "به علاقه‌مندی اضافه شد ❤️" : "از علاقه‌مندی حذف شد");
+    }
+
+    function renderFavorites() {
+      const grid = document.getElementById("favGrid");
+      const list = products.filter(p => favorites.includes(p.id) && p.status !== "حذف شده");
+      grid.innerHTML = list.map(p => createProductCard(p)).join("") || '<div class="empty-msg">هنوز چیزی به علاقه‌مندی اضافه نکردی ❤️</div>';
+    }
+
+    // ========== Order ==========
+    function goToOrder() {
+      if (cart.length === 0) return toast("سبد خرید خالی است");
+      showPage("order");
+      renderDeliveryOptions();
+      updateOrderTotal();
+    }
+
+    function renderDeliveryOptions() {
+      const container = document.getElementById("deliveryOptions");
+      const today = new Date();
+      const options = [
+        { days: 1, label: "فردا" },
+        { days: 2, label: "پس‌فردا" },
+        { days: 3, label: "سه روز بعد" }
+      ];
+      container.innerHTML = options.map((opt, i) => {
+        const d = new Date(today);
+        d.setDate(d.getDate() + opt.days);
+        const dateStr = d.toLocaleDateString("fa-IR", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+        return `
+          <label class="delivery-option ${i === 0 ? 'selected' : ''}">
+            <input type="radio" name="delivery" value="${opt.days}" ${i === 0 ? 'checked' : ''} onchange="selectDelivery(this)" />
+            <div>
+              <strong>${opt.label}</strong>
+              <div style="font-size:13px; color:var(--muted);">${dateStr}</div>
+            </div>
+          </label>
+        `;
+      }).join("");
+    }
+
+    function selectDelivery(el) {
+      document.querySelectorAll(".delivery-option").forEach(o => o.classList.remove("selected"));
+      el.closest(".delivery-option").classList.add("selected");
+    }
+
+    function updateOrderTotal() {
+      let total = 0;
+      cart.forEach(item => {
+        const p = products.find(x => x.id === item.id);
+        if (p) total += p.price * item.qty;
+      });
+      const ship = parseInt(document.getElementById("shippingPrice").value) || 0;
+      document.getElementById("orderTotal").textContent =
+        `جمع کالاها: ${formatPrice(total)} + ارسال: ${formatPrice(ship)} = ${formatPrice(total + ship)}`;
+    }
+
+    function submitOrder() {
+      const phone = document.getElementById("orderPhone").value.trim();
+      const address = document.getElementById("orderAddress").value.trim();
+      if (!phone || !address) return toast("لطفاً شماره تلفن و آدرس را وارد کنید");
+      const delivery = document.querySelector('input[name="delivery"]:checked')?.value || 1;
+      toast("✅ سفارش شما با موفقیت ثبت شد! به زودی تماس می‌گیریم");
+      cart = [];
+      saveCart();
+      setTimeout(() => showPage("home"), 1500);
+    }
+
+    // ========== Admin ==========
+    function openAdmin() {
+      document.getElementById("adminOverlay").classList.add("show");
+      if (isAdmin) renderAdminPanel();
+      else renderAdminLogin();
+    }
+    function closeAdmin() {
+      document.getElementById("adminOverlay").classList.remove("show");
+    }
+
+    function renderAdminLogin() {
+      document.getElementById("adminContent").innerHTML = `
+        <div class="login-box">
+          <h2>ورود به مدیریت</h2>
+          <input type="password" id="adminPass" placeholder="رمز عبور" maxlength="10" />
+          <button class="btn btn-primary" style="width:100%; padding:12px;" onclick="checkAdminPass()">ورود</button>
+        </div>
+      `;
+      document.getElementById("adminPass").focus();
+    }
+
+    function checkAdminPass() {
+      const pass = document.getElementById("adminPass").value;
+      if (pass === ADMIN_PASS) {
+        isAdmin = true;
+        renderAdminPanel();
+        toast("خوش آمدید مدیر عزیز 👋");
+      } else {
+        toast("رمز اشتباه است ❌");
+      }
+    }
+
+    function renderAdminPanel() {
+      document.getElementById("adminContent").innerHTML = `
+        <h3 style="margin-bottom:12px;">➕ افزودن / ویرایش کالا</h3>
+        <div class="admin-form">
+          <div class="form-group">
+            <label>عکس کالا</label>
+            <input type="file" id="prodImage" accept="image/*" onchange="previewImage(event)" />
+            <img id="imgPreview" style="max-width:120px; margin-top:8px; border-radius:8px; display:none;" />
+          </div>
+          <div class="form-group">
+            <label>نام کالا (برند + مدل) — کوتاه بنویس</label>
+            <input type="text" id="prodName" placeholder="مثال: جاروبرقی پارس خزر VC-2000" />
+            <button class="ai-btn" onclick="aiDetect()">🤖 تشخیص با هوش مصنوعی</button>
+          </div>
+          <div class="form-group">
+            <label>قیمت (تومان)</label>
+            <input type="number" id="prodPrice" placeholder="مثلاً 4500000" />
+          </div>
+          <div class="form-group">
+            <label>وضعیت</label>
+            <select id="prodStatus">
+              <option value="موجود">موجود</option>
+              <option value="موجود نیست">موجود نیست</option>
+            </select>
+          </div>
+          <input type="hidden" id="editId" value="" />
+          <button class="btn btn-primary" style="padding:12px;" onclick="saveProduct()">ذخیره کالا</button>
+        </div>
+        <h3 style="margin:24px 0 12px;">لیست کالاها</h3>
+        <div class="admin-products" id="adminList"></div>
+      `;
+      renderAdminList();
+    }
+
+    function previewImage(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const img = document.getElementById("imgPreview");
+        img.src = ev.target.result;
+        img.style.display = "block";
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // Mock AI detection
+    function aiDetect() {
+      const fileInput = document.getElementById("prodImage");
+      if (!fileInput.files[0]) return toast("اول عکس را انتخاب کن");
+      toast("🤖 در حال تشخیص...");
+      setTimeout(() => {
+        const samples = [
+          "جاروبرقی پارس خزر مدل VC-2200",
+          "قاشق استیل ۱۲ نفره هوم",
+          "مخلوط کن فیلیپس HR-3650",
+          "توستر نان نانوا T-800",
+          "چایی‌ساز فلر TS-090",
+          "کتری برقی بوش TWK-720",
+          "اسپرسوساز دلونگی EC-785",
+          "رنده برقی فیلیپس HR-2500"
+        ];
+        const name = samples[Math.floor(Math.random() * samples.length)];
+        document.getElementById("prodName").value = name;
+        toast("✅ تشخیص انجام شد: " + name);
+      }, 1200);
+    }
+
+    function saveProduct() {
+      const name = document.getElementById("prodName").value.trim();
+      const price = parseInt(document.getElementById("prodPrice").value);
+      const status = document.getElementById("prodStatus").value;
+      const editId = document.getElementById("editId").value;
+      const imgEl = document.getElementById("imgPreview");
+      let image = imgEl.style.display !== "none" ? imgEl.src : "https://via.placeholder.com/300x300?text=کالا";
+
+      if (!name || !price) return toast("نام و قیمت الزامی است");
+
+      if (editId) {
+        const p = products.find(x => x.id == editId);
+        if (p) {
+          p.name = name;
+          p.price = price;
+          p.status = status;
+          if (imgEl.style.display !== "none") p.image = image;
+        }
+        toast("کالا ویرایش شد ✅");
+      } else {
+        const newId = products.length ? Math.max(...products.map(p => p.id)) + 1 : 1;
+        products.push({ id: newId, name, price, image, status });
+        toast("کالا اضافه شد ✅");
+      }
+      saveProducts();
+      renderAdminList();
+      renderHome();
+      document.getElementById("prodName").value = "";
+      document.getElementById("prodPrice").value = "";
+      document.getElementById("editId").value = "";
+      document.getElementById("imgPreview").style.display = "none";
+      document.getElementById("prodImage").value = "";
+    }
+
+    function renderAdminList() {
+      const list = document.getElementById("adminList");
+      const active = products.filter(p => p.status !== "حذف شده");
+      list.innerHTML = active.map(p => `
+        <div class="admin-item">
+          <img src="${p.image}" alt="" />
+          <div class="admin-item-info">
+            <div style="font-weight:600; font-size:13px;">${p.name}</div>
+            <div style="color:var(--primary); font-size:13px;">${formatPrice(p.price)} — ${p.status}</div>
+          </div>
+          <div class="admin-item-actions">
+            <button class="btn-sm btn-warning" onclick="editProduct(${p.id})">ویرایش</button>
+            <button class="btn-sm \( {p.status === 'موجود' ? 'btn-danger' : 'btn-success'}" onclick="toggleStatus( \){p.id})">
+              ${p.status === 'موجود' ? 'ناموجود کن' : 'موجود کن'}
+            </button>
+            <button class="btn-sm btn-danger" onclick="deleteProduct(${p.id})">حذف</button>
+          </div>
+        </div>
+      `).join("") || '<div class="empty-msg">کالایی نیست</div>';
+    }
+
+    function editProduct(id) {
+      const p = products.find(x => x.id === id);
+      if (!p) return;
+      document.getElementById("prodName").value = p.name;
+      document.getElementById("prodPrice").value = p.price;
+      document.getElementById("prodStatus").value = p.status;
+      document.getElementById("editId").value = p.id;
+      const img = document.getElementById("imgPreview");
+      img.src = p.image;
+      img.style.display = "block";
+      toast("در حال ویرایش...");
+    }
+
+    function toggleStatus(id) {
+      const p = products.find(x => x.id === id);
+      if (!p) return;
+      p.status = p.status === "موجود" ? "موجود نیست" : "موجود";
+      saveProducts();
+      renderAdminList();
+      renderHome();
+      toast("وضعیت تغییر کرد");
+    }
+
+    function deleteProduct(id) {
+      if (!confirm("مطمئنی می‌خوای این کالا رو حذف کنی؟")) return;
+      const p = products.find(x => x.id === id);
+      if (p) p.status = "حذف شده";
+      saveProducts();
+      renderAdminList();
+      renderHome();
+      toast("کالا حذف شد");
+    }
+
+    // ========== Init ==========
+    updateBadges();
+    renderHome();
+  </script>
+</body>
+          </html>
